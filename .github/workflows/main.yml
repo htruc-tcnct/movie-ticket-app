@@ -1,10 +1,7 @@
-name: CI/CD for React Movie Ticket App
+name: CI/CD for Movie App
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -12,82 +9,65 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Enable corepack
-        run: corepack enable
-
-      - name: Install pnpm
-        run: corepack prepare pnpm@latest --activate
-
-      - name: Verify pnpm installation
-        run: pnpm --version
+      - name: Enable corepack & install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm --version
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Build application
-        run: pnpm run build
+      # - name: Run tests
+      #   run: pnpm test
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: movie-build
+          path: dist
 
   deploy:
-    needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-and-test
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          name: movie-build
+          path: dist
 
-      - name: Enable corepack
-        run: corepack enable
+      - name: Debug SSH key
+        run: echo "EC2_SSH_KEY length: ${#EC2_SSH_KEY}"  # Kiểm tra độ dài key
 
-      - name: Install pnpm
-        run: corepack prepare pnpm@latest --activate
-
-      - name: Verify pnpm installation
-        run: pnpm --version
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build application
-        run: pnpm run build
-
-      - name: Debug SSH_PRIVATE_KEY
-        run: echo "SSH_PRIVATE_KEY length: ${#SSH_PRIVATE_KEY}" 
-
-      - name: Copy files to EC2 with SCP
+      - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  
-          source: "dist/*"  
-          target: ${{ secrets.EC2_DEST_PATH_APP }}  
-          strip_components: 1  
-          overwrite: true  
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"
+          target: "/var/www/movie"
+          strip_components: 1  # Loại bỏ thư mục dist khỏi đường dẫn
+          overwrite: true  # Ghi đè file nếu tồn tại
+          debug: true  # Bật debug để xem log chi tiết
 
-      - name: Execute deployment commands on EC2
+      - name: Restart Nginx
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ${{ secrets.EC2_DEST_PATH_APP }}
-            git pull origin main
-            pnpm install
-            pnpm run build
             sudo systemctl restart nginx
