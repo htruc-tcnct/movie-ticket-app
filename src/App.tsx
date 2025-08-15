@@ -11,22 +11,31 @@ function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/movies')
-      .then((res) => res.json())
+    fetch('/movies') // Sử dụng relative URL vì reverse proxy xử lý
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => setMovies(data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Error fetching movies:', err));
   }, []);
 
   return (
     <div className="App">
       <h1>Movie Ticket App</h1>
-      <ul>
-        {movies.map((movie) => (
-          <li key={movie.id}>
-            {movie.title} ({movie.year})
-          </li>
-        ))}
-      </ul>
+      {movies.length === 0 ? (
+        <p>Loading movies...</p>
+      ) : (
+        <ul>
+          {movies.map((movie) => (
+            <li key={movie.id}>
+              {movie.title} ({movie.year})
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
