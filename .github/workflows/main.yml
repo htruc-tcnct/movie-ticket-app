@@ -66,18 +66,18 @@ jobs:
         run: pnpm run build
 
       - name: Debug SSH_PRIVATE_KEY
-        run: echo "SSH_PRIVATE_KEY length: ${#SSH_PRIVATE_KEY}"  # Kiểm tra độ dài key
+        run: echo "SSH_PRIVATE_KEY length: ${#SSH_PRIVATE_KEY}" 
 
       - name: Copy files to EC2 with SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # Truyền private key trực tiếp
-          source: "dist/*"  # Copy toàn bộ thư mục dist
-          target: ${{ secrets.EC2_DEST_PATH_APP }}  # Đích trên EC2
-          strip_components: 1  # Loại bỏ thư mục dist khỏi đường dẫn
-          overwrite: true  # Ghi đè file nếu tồn tại
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  
+          source: "dist/*"  
+          target: ${{ secrets.EC2_DEST_PATH_APP }}  
+          strip_components: 1  
+          overwrite: true  
 
       - name: Execute deployment commands on EC2
         uses: appleboy/ssh-action@v1.0.3
