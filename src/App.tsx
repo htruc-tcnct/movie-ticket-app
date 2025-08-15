@@ -14,7 +14,7 @@ function App() {
     fetch('/movies') 
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
+          throw new Error(`HTTP erraor! Status: ${res.status}`);
         }
         return res.json();
       })

@@ -49,7 +49,7 @@ jobs:
           path: dist
 
       - name: Debug SSH key
-        run: echo "EC2_SSH_KEY length: ${#EC2_SSH_KEY}"  # Kiểm tra độ dài key
+        run: echo "EC2_SSH_KEY length: ${#EC2_SSH_KEY}"  
 
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
