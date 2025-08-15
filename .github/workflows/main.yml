@@ -19,10 +19,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'pnpm'  # Cấu hình cache cho pnpm
+
+      - name: Enable corepack
+        run: corepack enable  # Kích hoạt corepack
 
       - name: Install pnpm
-        run: npm install -g pnpm  # Cài pnpm toàn cục
+        run: corepack prepare pnpm@latest --activate  # Cài và kích hoạt pnpm
+
+      - name: Verify pnpm installation
+        run: pnpm --version  # Kiểm tra phiên bản pnpm
 
       - name: Install dependencies
         run: pnpm install
@@ -44,8 +50,14 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Enable corepack
+        run: corepack enable
+
       - name: Install pnpm
-        run: npm install -g pnpm  # Cài pnpm toàn cục
+        run: corepack prepare pnpm@latest --activate
+
+      - name: Verify pnpm installation
+        run: pnpm --version
 
       - name: Install dependencies
         run: pnpm install
