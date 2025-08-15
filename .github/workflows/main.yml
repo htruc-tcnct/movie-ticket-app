@@ -6,18 +6,19 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup Node.js & pnpm
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-      - run: |
+
+      - name: Enable corepack & install pnpm
+        run: |
           corepack enable
           corepack prepare pnpm@latest --activate
           pnpm --version
@@ -25,9 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Nếu muốn bỏ qua test, chỉ cần comment 2 dòng sau
-      - name: Run tests (optional)
-        run: pnpm test || echo "Tests failed or not found, skipping..."
+      # - name: Run tests
+      #   run: pnpm test
 
       - name: Build project
         run: pnpm build
@@ -40,7 +40,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-and-test
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
