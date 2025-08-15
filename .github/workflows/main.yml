@@ -1,3 +1,4 @@
+```yaml
 name: CI/CD for React Movie Ticket App
 
 on:
@@ -22,7 +23,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm  # Cài pnpm toàn cục
 
       - name: Install dependencies
         run: pnpm install
@@ -45,7 +46,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm  # Cài pnpm toàn cục
 
       - name: Install dependencies
         run: pnpm install
@@ -70,3 +71,4 @@ jobs:
             sudo systemctl restart nginx
           EOF
           rm private_key
+```
