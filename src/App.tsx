@@ -24,7 +24,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Movie Ticket App</h1>
+
+      <h1>PBL6: Movie Ticket App</h1>
       {movies.length === 0 ? (
         <p>Loading movies...</p>
       ) : (
