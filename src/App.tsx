@@ -11,7 +11,7 @@ function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    fetch('/movies') // Sử dụng relative URL vì reverse proxy xử lý
+    fetch('/movies') 
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
