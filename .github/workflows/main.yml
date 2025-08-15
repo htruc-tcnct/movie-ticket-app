@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # - name: Run tests
-      #   run: pnpm test
+      - name: Run tests
+        run: pnpm test
 
       - name: Build project
         run: pnpm build
@@ -48,9 +48,6 @@ jobs:
           name: movie-build
           path: dist
 
-      - name: Debug SSH key
-        run: echo "EC2_SSH_KEY length: ${#EC2_SSH_KEY}"  
-
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -59,9 +56,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "dist/*"
           target: "/var/www/movie"
-          strip_components: 1  # Loại bỏ thư mục dist khỏi đường dẫn
-          overwrite: true  # Ghi đè file nếu tồn tại
-          debug: true  # Bật debug để xem log chi tiết
 
       - name: Restart Nginx
         uses: appleboy/ssh-action@v1.0.3
